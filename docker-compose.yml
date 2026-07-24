@@ -1,0 +1,131 @@
+# =============================================================================
+# WAP Reconciliation Framework — Docker Compose
+#
+# Services:
+#   postgres  — Postgres 16, health-checked, named volume
+#   migrate   — Runs migration runner once, then exits (depends on postgres)
+#   app       — Framework entry point (depends on migrate completing)
+#   test      — Runs full pytest suite against the compose postgres
+#
+# Usage:
+#   # Start postgres + run migrations:
+#   docker compose up migrate
+#
+#   # Run integration tests:
+#   docker compose run --rm test
+#
+#   # Full stack:
+#   docker compose up app
+#
+#   # Tear down (keep data):
+#   docker compose down
+#
+#   # Tear down (destroy data):
+#   docker compose down -v
+#
+# Environment:
+#   Copy .env.example to .env and fill in values before running.
+#   docker-compose.yml reads from .env automatically.
+# =============================================================================
+
+services:
+
+  # ── Postgres ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: wap_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-wap_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-wap_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes:
+      - wap_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wap_user} -d ${POSTGRES_DB:-wap_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - wap_net
+
+  # ── Migration runner ───────────────────────────────────────────────────────
+  # Runs once on startup, applies pending migrations, then exits (code 0).
+  # The `app` and `test` services use `service_completed_successfully`
+  # so they only start after migrations are confirmed applied.
+  migrate:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: base
+    container_name: wap_migrate
+    command: ["python", "-m", "db.migrations.run_migrations"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-wap_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-wap_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wap_net
+    restart: "no"
+
+  # ── App service (placeholder — expanded from Day 5 onwards) ───────────────
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: base
+    container_name: wap_app
+    environment:
+      DATABASE_URL:    postgresql://${POSTGRES_USER:-wap_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-wap_db}
+      WAP_POOL_MIN_CONN: ${WAP_POOL_MIN_CONN:-2}
+      WAP_POOL_MAX_CONN: ${WAP_POOL_MAX_CONN:-10}
+    volumes:
+      # Mount source for development — remove for production builds.
+      - ..:/app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - wap_net
+    restart: unless-stopped
+    # Override CMD for specific use cases, e.g.:
+    #   docker compose run --rm app python examples/fx_pipeline_demo.py
+
+  # ── Test runner ────────────────────────────────────────────────────────────
+  # Run with: docker compose run --rm test
+  # Runs unit + integration tests. Integration tests connect to the
+  # compose postgres (not a separate testcontainer).
+  test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: test
+    container_name: wap_test
+    environment:
+      DATABASE_URL:    postgresql://${POSTGRES_USER:-wap_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-wap_db}
+      WAP_POOL_MIN_CONN: "1"
+      WAP_POOL_MAX_CONN: "5"
+    volumes:
+      - ..:/app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - wap_net
+    restart: "no"
+    command: ["pytest", "tests/", "-v", "--tb=short", "-p", "no:warnings"]
+
+# ── Volumes ────────────────────────────────────────────────────────────────
+volumes:
+  wap_postgres_data:
+    name: wap_postgres_data
+
+# ── Networks ───────────────────────────────────────────────────────────────
+networks:
+  wap_net:
+    name: wap_net
+    driver: bridge

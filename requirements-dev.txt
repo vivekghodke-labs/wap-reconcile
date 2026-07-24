@@ -1,0 +1,19 @@
+# WAP Reconciliation Framework — Development & Test Dependencies
+#
+# Extends requirements.txt (runtime deps are assumed installed).
+# Install both:
+#   pip install -r requirements.txt -r requirements-dev.txt
+#
+# Never import from these packages in core/ or backends/ — they must
+# not leak into the runtime dependency surface.
+
+# ── Testing ────────────────────────────────────────────────────────────────
+pytest>=8.2,<9.0
+pytest-env>=1.1,<2.0          # Set env vars for test sessions via pytest.ini
+
+# ── Linting & Formatting ───────────────────────────────────────────────────
+ruff>=0.4,<1.0                # Replaces flake8 + isort + pyupgrade
+
+# ── Type Checking ──────────────────────────────────────────────────────────
+mypy>=1.10,<2.0
+types-psycopg2>=2.9,<3.0      # Stubs for psycopg2

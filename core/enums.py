@@ -20,9 +20,9 @@ class AssertionStatus(str, Enum):
 class RunStatus(str, Enum):
     """Terminal state of a full reconciliation run."""
 
-    PUBLISHED = "published"          # all assertions passed, staging promoted
-    ROUTED_TO_REVIEW = "routed_to_review"  # one or more assertions failed
-    ERRORED = "errored"              # pipeline-level failure (staging write, ref resolution, etc.)
+    PUBLISHED = "published"                    # all assertions passed, staging promoted
+    ROUTED_TO_REVIEW = "routed_to_review"      # one or more assertions failed
+    ERRORED = "errored"                        # pipeline-level failure
 
 
 class Severity(str, Enum):

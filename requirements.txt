@@ -1,0 +1,13 @@
+# WAP Reconciliation Framework — Runtime Dependencies
+#
+# Pin to minor versions (X.Y.*) for reproducibility without blocking
+# patch-level security fixes. Exact pins (==) belong in a lock file,
+# not here — this is a framework, not a deployed application.
+#
+# Update policy: bump minor versions deliberately after testing;
+# never auto-update via Dependabot without running the full test suite.
+
+# Postgres driver — binary wheel avoids C compilation in most environments.
+# On platforms without a pre-built wheel (e.g. linux/arm64 from source),
+# the Dockerfile installs libpq-dev + gcc as a fallback.
+psycopg2-binary>=2.9,<3.0

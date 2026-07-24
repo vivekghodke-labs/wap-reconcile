@@ -1,11 +1,6 @@
 """
 StagingWriter contract.
 
-NOTE (Day 1 scope): this module intentionally contains only the
-interface. The Postgres-backed implementation is deferred to Day 2 —
-Day 1 is contracts-only, no I/O, so the framework's shape is agreed
-before any persistence detail leaks into it.
-
 The WAP pattern's core guarantee is: data written here is never
 trusted by consumers until Publisher.promote() succeeds. Any
 implementation of this interface must physically isolate staged data
