@@ -14,9 +14,7 @@ class AssertionStatus(str, Enum):
 
     PASSED = "passed"
     FAILED = "failed"
-    ERRORED = (
-        "errored"  # assertion itself could not execute (e.g. reference unavailable)
-    )
+    ERRORED = "errored"
 
 
 class RunStatus(str, Enum):
