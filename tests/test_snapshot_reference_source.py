@@ -24,13 +24,11 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-import psycopg2
 import pytest
 from psycopg2.extras import Json
 
 from backends.postgres.connection import get_connection
 from core.reference_source import ReferenceResolutionError, SnapshotReferenceSource
-
 
 # ---------------------------------------------------------------------------
 # Helper: insert a published record directly (bypassing Publisher)
@@ -59,16 +57,18 @@ def _insert_published_record(
             (%(published_ref)s, %(dataset_key)s, %(run_id)s::uuid,
              %(staging_ref)s, %(payload)s, %(published_at)s)
     """
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, {
+    with get_connection() as conn, conn.cursor() as cur:
+        cur.execute(
+            sql,
+            {
                 "published_ref": _published_ref,
                 "dataset_key": dataset_key,
                 "run_id": _run_id,
                 "staging_ref": _staging_ref,
                 "payload": Json(payload),
                 "published_at": _published_at,
-            })
+            },
+        )
         conn.commit()
 
     return _published_ref
@@ -88,7 +88,9 @@ class TestNoSnapshotExists:
         """
         source = SnapshotReferenceSource()
 
-        with pytest.raises(ReferenceResolutionError, match="No prior published snapshot"):
+        with pytest.raises(
+            ReferenceResolutionError, match="No prior published snapshot"
+        ):
             source.resolve("fx_rates")
 
     def test_resolve_raises_for_unknown_key_even_if_others_exist(self, clean_db):
@@ -97,7 +99,9 @@ class TestNoSnapshotExists:
 
         source = SnapshotReferenceSource()
 
-        with pytest.raises(ReferenceResolutionError, match="No prior published snapshot"):
+        with pytest.raises(
+            ReferenceResolutionError, match="No prior published snapshot"
+        ):
             source.resolve("fx_rates")
 
 
@@ -135,7 +139,9 @@ class TestSnapshotExists:
         old_payload = {"USD_GBP": 0.75, "note": "old"}
         new_payload = {"USD_GBP": 0.79, "note": "new"}
 
-        _insert_published_record("fx_rates", old_payload, published_at=now - timedelta(days=1))
+        _insert_published_record(
+            "fx_rates", old_payload, published_at=now - timedelta(days=1)
+        )
         _insert_published_record("fx_rates", new_payload, published_at=now)
 
         source = SnapshotReferenceSource()
@@ -190,7 +196,10 @@ class TestSnapshotExists:
 
     def test_resolve_list_payload_returned_as_list(self, clean_db):
         """JSONB supports top-level arrays; resolve must return them as list."""
-        payload_list = [{"currency": "USD", "rate": 1.0}, {"currency": "GBP", "rate": 0.79}]
+        payload_list = [
+            {"currency": "USD", "rate": 1.0},
+            {"currency": "GBP", "rate": 0.79},
+        ]
 
         # Insert directly with a list payload
         _run_id = str(uuid.uuid4())
@@ -201,26 +210,27 @@ class TestSnapshotExists:
                 (%(published_ref)s, %(dataset_key)s, %(run_id)s::uuid,
                  %(staging_ref)s, %(payload)s)
         """
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(sql, {
+        with get_connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                sql,
+                {
                     "published_ref": f"published://fx_list/{_run_id}",
                     "dataset_key": "fx_list",
                     "run_id": _run_id,
                     "staging_ref": f"staging://fx_list/{_run_id}",
                     "payload": Json(payload_list),
-                })
+                },
+            )
             conn.commit()
 
-        source = SnapshotReferenceSource()
+        _source = SnapshotReferenceSource()
         # SnapshotReferenceSource.resolve() currently returns dict(row["payload"]).
         # List payloads require direct access — this test documents the current
         # behaviour and will guide the Day 3 Publisher to handle both types.
         # For now, list payloads resolve via direct row access.
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT payload FROM published.latest_by_dataset WHERE dataset_key = 'fx_list'"
-                )
-                row = cur.fetchone()
+        with get_connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT payload FROM published.latest_by_dataset WHERE dataset_key = 'fx_list'"
+            )
+            row = cur.fetchone()
         assert row[0] == payload_list

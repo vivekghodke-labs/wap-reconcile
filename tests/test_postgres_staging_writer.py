@@ -26,7 +26,6 @@ from backends.postgres.staging_writer import PostgresStagingWriter
 from core.models import new_run_id
 from core.staging import StagingWriteError
 
-
 # ---------------------------------------------------------------------------
 # Happy path — write
 # ---------------------------------------------------------------------------
@@ -196,7 +195,7 @@ class TestDatasetKeyValidation:
             staging_writer.write("oil/gas", {"v": 1})
 
     def test_key_with_backslash_raises(self, staging_writer):
-        with pytest.raises(StagingWriteError, match=r"'\\\\'"):
+        with pytest.raises(StagingWriteError, match=r"'\\'"):
             staging_writer.write("oil\\gas", {"v": 1})
 
     def test_key_with_underscores_and_dots_is_valid(self, staging_writer):
@@ -241,12 +240,11 @@ class TestStagingRefFor:
         """Calling staging_ref_for must not insert any row."""
         staging_writer.staging_ref_for("fx_rates")
 
-        with get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT COUNT(*) FROM staging.records WHERE dataset_key = 'fx_rates'"
-                )
-                count = cur.fetchone()[0]
+        with get_connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM staging.records WHERE dataset_key = 'fx_rates'"
+            )
+            count = cur.fetchone()[0]
 
         assert count == 0
 
@@ -274,4 +272,4 @@ class TestRunIdAccessor:
 # Import fix for staging_ref_for test that uses get_connection directly
 # ---------------------------------------------------------------------------
 
-from backends.postgres.connection import get_connection  # noqa: E402
+from backends.postgres.connection import get_connection

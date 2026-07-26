@@ -16,9 +16,10 @@ Design rules enforced here (do not relax without a documented reason):
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Mapping, Sequence
+from typing import Any
 from uuid import uuid4
 
 from core.enums import AssertionStatus, RunStatus, Severity

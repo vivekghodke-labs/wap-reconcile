@@ -109,10 +109,12 @@ class SnapshotReferenceSource(ReferenceSource):
             WHERE dataset_key = %(key)s
         """
         try:
-            with get_connection() as conn:
-                with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    cur.execute(sql, {"key": key})
-                    row = cur.fetchone()
+            with (
+                get_connection() as conn,
+                conn.cursor(cursor_factory=RealDictCursor) as cur,
+            ):
+                cur.execute(sql, {"key": key})
+                row = cur.fetchone()
         except psycopg2.Error as exc:
             raise ReferenceResolutionError(
                 f"Database error resolving reference for '{key}': {exc}"

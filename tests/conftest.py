@@ -25,14 +25,12 @@ from __future__ import annotations
 
 import os
 
-import psycopg2
 import pytest
 
 from backends.postgres.connection import get_connection, reset_pool
 from backends.postgres.staging_writer import PostgresStagingWriter
 from core.models import new_run_id
 from db.migrations.run_migrations import run_migrations
-
 
 # ---------------------------------------------------------------------------
 # Session-scoped: run migrations once for the entire test session

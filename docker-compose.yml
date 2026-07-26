@@ -58,8 +58,8 @@ services:
   # so they only start after migrations are confirmed applied.
   migrate:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       target: base
     container_name: wap_migrate
     command: ["python", "-m", "db.migrations.run_migrations"]
@@ -75,8 +75,8 @@ services:
   # ── App service (placeholder — expanded from Day 5 onwards) ───────────────
   app:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       target: base
     container_name: wap_app
     environment:
@@ -85,7 +85,7 @@ services:
       WAP_POOL_MAX_CONN: ${WAP_POOL_MAX_CONN:-10}
     volumes:
       # Mount source for development — remove for production builds.
-      - ..:/app
+      - .:/app
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -101,16 +101,17 @@ services:
   # compose postgres (not a separate testcontainer).
   test:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       target: test
     container_name: wap_test
+    user: root
     environment:
       DATABASE_URL:    postgresql://${POSTGRES_USER:-wap_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-wap_db}
       WAP_POOL_MIN_CONN: "1"
       WAP_POOL_MAX_CONN: "5"
     volumes:
-      - ..:/app
+      - .:/app
     depends_on:
       migrate:
         condition: service_completed_successfully

@@ -26,7 +26,6 @@ Design invariants:
 
 from __future__ import annotations
 
-import json
 import re
 from typing import Any
 from uuid import UUID
@@ -35,7 +34,7 @@ import psycopg2
 from psycopg2.extras import Json, RealDictCursor
 
 from backends.postgres.connection import get_connection
-from core.staging import StagingWriter, StagingWriteError
+from core.staging import StagingWriteError, StagingWriter
 
 # Matches staging://{dataset_key}/{run_id}
 _STAGING_REF_PATTERN = re.compile(
@@ -144,14 +143,16 @@ class PostgresStagingWriter(StagingWriter):
                 (%(staging_ref)s, %(dataset_key)s, %(run_id)s::uuid, %(payload)s)
         """
         try:
-            with get_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(sql, {
+            with get_connection() as conn, conn.cursor() as cur:
+                cur.execute(
+                    sql,
+                    {
                         "staging_ref": staging_ref,
                         "dataset_key": key,
                         "run_id": self._run_id,
                         "payload": Json(data),
-                    })
+                    },
+                )
                 conn.commit()
         except psycopg2.errors.UniqueViolation as exc:
             raise StagingWriteError(
@@ -179,7 +180,7 @@ class PostgresStagingWriter(StagingWriter):
             StagingWriteError: staging_ref not found, invalid format,
                                or any DB error.
         """
-        dataset_key, run_id = _parse_staging_ref(staging_ref)
+        _dataset_key, _run_id = _parse_staging_ref(staging_ref)
 
         sql = """
             SELECT payload
@@ -187,10 +188,12 @@ class PostgresStagingWriter(StagingWriter):
             WHERE staging_ref = %(staging_ref)s
         """
         try:
-            with get_connection() as conn:
-                with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    cur.execute(sql, {"staging_ref": staging_ref})
-                    row = cur.fetchone()
+            with (
+                get_connection() as conn,
+                conn.cursor(cursor_factory=RealDictCursor) as cur,
+            ):
+                cur.execute(sql, {"staging_ref": staging_ref})
+                row = cur.fetchone()
         except psycopg2.Error as exc:
             raise StagingWriteError(
                 f"Failed to read staged record '{staging_ref}': {exc}"

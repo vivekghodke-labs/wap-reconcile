@@ -31,7 +31,6 @@ Design:
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 
 import psycopg2
@@ -65,10 +64,7 @@ def _get_migration_files() -> list[Path]:
     Return all .sql files in the migrations directory, sorted by name.
     run_migrations.py itself is excluded.
     """
-    files = sorted(
-        p for p in MIGRATIONS_DIR.glob("*.sql")
-        if p.is_file()
-    )
+    files = sorted(p for p in MIGRATIONS_DIR.glob("*.sql") if p.is_file())
     return files
 
 
@@ -90,9 +86,7 @@ def run_migrations(migrations_dir: Path | None = None) -> None:
     if not target_dir.exists():
         raise FileNotFoundError(f"Migrations directory not found: {target_dir}")
 
-    migration_files = sorted(
-        p for p in target_dir.glob("*.sql") if p.is_file()
-    )
+    migration_files = sorted(p for p in target_dir.glob("*.sql") if p.is_file())
 
     if not migration_files:
         logger.info("No migration files found in %s — nothing to apply.", target_dir)
@@ -128,8 +122,7 @@ def run_migrations(migrations_dir: Path | None = None) -> None:
             except psycopg2.Error as exc:
                 conn.rollback()
                 logger.error(
-                    "Migration failed: %s — rolled back. Error: %s",
-                    filename, exc
+                    "Migration failed: %s — rolled back. Error: %s", filename, exc
                 )
                 raise
 

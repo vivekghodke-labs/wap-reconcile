@@ -19,8 +19,12 @@ from core.models import (
 )
 
 
-def make_result(status: AssertionStatus, severity: Severity = Severity.WARN,
-                 message: str = "ok", name: str = "test_assertion") -> AssertionResult:
+def make_result(
+    status: AssertionStatus,
+    severity: Severity = Severity.WARN,
+    message: str = "ok",
+    name: str = "test_assertion",
+) -> AssertionResult:
     return AssertionResult(
         assertion_name=name,
         status=status,
@@ -75,7 +79,10 @@ class TestReconciliationReport:
     def test_all_passed_true_when_no_failures(self):
         report = ReconciliationReport(
             run_id=new_run_id(),
-            results=[make_result(AssertionStatus.PASSED), make_result(AssertionStatus.PASSED)],
+            results=[
+                make_result(AssertionStatus.PASSED),
+                make_result(AssertionStatus.PASSED),
+            ],
         )
         assert report.all_passed is True
         assert report.failed_results == ()
@@ -101,8 +108,12 @@ class TestReconciliationReport:
         report = ReconciliationReport(
             run_id=new_run_id(),
             results=[
-                make_result(AssertionStatus.FAILED, severity=Severity.WARN, message="a"),
-                make_result(AssertionStatus.FAILED, severity=Severity.CRITICAL, message="b"),
+                make_result(
+                    AssertionStatus.FAILED, severity=Severity.WARN, message="a"
+                ),
+                make_result(
+                    AssertionStatus.FAILED, severity=Severity.CRITICAL, message="b"
+                ),
                 make_result(AssertionStatus.PASSED, severity=Severity.INFO),
             ],
         )

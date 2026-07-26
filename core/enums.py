@@ -14,15 +14,17 @@ class AssertionStatus(str, Enum):
 
     PASSED = "passed"
     FAILED = "failed"
-    ERRORED = "errored"  # assertion itself could not execute (e.g. reference unavailable)
+    ERRORED = (
+        "errored"  # assertion itself could not execute (e.g. reference unavailable)
+    )
 
 
 class RunStatus(str, Enum):
     """Terminal state of a full reconciliation run."""
 
-    PUBLISHED = "published"                    # all assertions passed, staging promoted
-    ROUTED_TO_REVIEW = "routed_to_review"      # one or more assertions failed
-    ERRORED = "errored"                        # pipeline-level failure
+    PUBLISHED = "published"  # all assertions passed, staging promoted
+    ROUTED_TO_REVIEW = "routed_to_review"  # one or more assertions failed
+    ERRORED = "errored"  # pipeline-level failure
 
 
 class Severity(str, Enum):

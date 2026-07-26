@@ -36,8 +36,8 @@ from __future__ import annotations
 
 import os
 import threading
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
@@ -75,7 +75,7 @@ def _build_dsn() -> str:
     }
     missing = [k for k, v in required.items() if not v]
     if missing:
-        raise EnvironmentError(
+        raise OSError(
             f"Missing required environment variables for Postgres connection: "
             f"{', '.join(missing)}. "
             "Set DATABASE_URL or all of POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD."
