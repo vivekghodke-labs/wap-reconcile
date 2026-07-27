@@ -61,6 +61,35 @@ from core.reference_source import (
 )
 from core.staging import StagingWriter
 
+
+@pytest.fixture(scope="session", autouse=True)
+def _airflow_metadata_db():
+    """
+    Ensure Airflow's own metadata DB (task_instance, dag_run, etc.) is
+    migrated before any test in this module runs.
+
+    Mirrors tests/conftest.py's db_session fixture, which auto-runs the
+    framework's own Postgres migrations rather than requiring a manual
+    step before `pytest` can be invoked. DAG.test() in TestDagLevelSmoke
+    queries task_instance/dag_run directly — on a fresh AIRFLOW_HOME
+    (e.g. a clean CI runner) those tables don't exist yet without this.
+
+    Uses the public `airflow db migrate` command via subprocess rather
+    than a version-specific internal API, since the internal migration
+    entrypoint has moved across Airflow major versions.
+    """
+    import subprocess
+    import sys
+
+    subprocess.run(
+        [sys.executable, "-m", "airflow", "db", "migrate"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    yield
+
+
 # ---------------------------------------------------------------------------
 # Fakes — satisfy the same interfaces as the real Postgres-backed classes,
 # entirely in memory. No DB, no network.

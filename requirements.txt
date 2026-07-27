@@ -11,3 +11,4 @@
 # On platforms without a pre-built wheel (e.g. linux/arm64 from source),
 # the Dockerfile installs libpq-dev + gcc as a fallback.
 psycopg2-binary>=2.9,<3.0
+apache-airflow>=2.9,<3.0   # adapter tests only — not a core/ dependency
