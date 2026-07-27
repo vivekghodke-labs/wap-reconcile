@@ -113,9 +113,7 @@ class FxRateReconciliation(Assertion):
             s_val = staged[key]
             r_val = reference[key]
 
-            if not isinstance(s_val, (int, float)) or not isinstance(
-                r_val, (int, float)
-            ):
+            if not isinstance(s_val, (int, float)) or not isinstance(r_val, (int, float)):
                 mismatches[key] = {
                     "staged": s_val,
                     "reference": r_val,
@@ -155,9 +153,7 @@ class FxRateReconciliation(Assertion):
         # Build a human-readable, reviewer-actionable failure message
         parts: list[str] = []
         if mismatches:
-            parts.append(
-                f"{len(mismatches)} pair(s) exceed tolerance={self._tolerance}"
-            )
+            parts.append(f"{len(mismatches)} pair(s) exceed tolerance={self._tolerance}")
         if missing_in_staged:
             parts.append(f"{len(missing_in_staged)} pair(s) missing from staged")
         if extra_in_staged:
@@ -207,9 +203,7 @@ class FxRateReconciliation(Assertion):
                 assertion_name=self.name,
                 status=AssertionStatus.FAILED,
                 severity=self.severity,
-                message=(
-                    f"reference payload must be a dict, got {type(reference).__name__}."
-                ),
+                message=(f"reference payload must be a dict, got {type(reference).__name__}."),
                 evidence={"reference_type": type(reference).__name__},
             )
         return None

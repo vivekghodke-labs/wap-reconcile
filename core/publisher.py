@@ -46,6 +46,7 @@ published_ref format: published://{dataset_key}/{run_id}
 """
 
 from __future__ import annotations
+from typing import Any, cast
 
 import dataclasses
 import json
@@ -248,8 +249,7 @@ class Publisher:
             return
 
         failed_names = [
-            f"{r.assertion_name} [{r.severity.value}]: {r.message}"
-            for r in report.failed_results
+            f"{r.assertion_name} [{r.severity.value}]: {r.message}" for r in report.failed_results
         ]
         summary = "; ".join(failed_names)
 
@@ -261,9 +261,7 @@ class Publisher:
         )
 
     @staticmethod
-    def _read_staged_payload(
-        cur: psycopg2.extensions.cursor, staging_ref: str
-    ) -> dict | list:
+    def _read_staged_payload(cur: psycopg2.extensions.cursor, staging_ref: str) -> dict | list:
         """
         Read the staged payload inside the publish transaction.
 
@@ -283,7 +281,7 @@ class Publisher:
                 "The record may have been deleted between assertion execution "
                 "and promotion. Re-run with a new run_id."
             )
-        return row["payload"]
+        return cast(dict[str, Any], row)["payload"]
 
     @staticmethod
     def _insert_published_record(

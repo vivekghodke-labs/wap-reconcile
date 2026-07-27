@@ -121,9 +121,7 @@ def run_migrations(migrations_dir: Path | None = None) -> None:
                 logger.info("Migration applied successfully: %s", filename)
             except psycopg2.Error as exc:
                 conn.rollback()
-                logger.error(
-                    "Migration failed: %s — rolled back. Error: %s", filename, exc
-                )
+                logger.error("Migration failed: %s — rolled back. Error: %s", filename, exc)
                 raise
 
 

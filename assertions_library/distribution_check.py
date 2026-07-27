@@ -189,16 +189,12 @@ class NumericDistributionCheck(Assertion):
 
         # Mean drift check
         mean_drift = self._relative_drift(staged_mean, reference_mean)
-        evidence["mean_drift"] = (
-            round(mean_drift, 6) if mean_drift is not None else None
-        )
+        evidence["mean_drift"] = round(mean_drift, 6) if mean_drift is not None else None
 
         if mean_drift is None:
             # reference_mean is 0 — relative drift undefined
             if abs(staged_mean) > 1e-10:
-                failures.append(
-                    f"reference mean is 0 but staged mean is {staged_mean:.6f}"
-                )
+                failures.append(f"reference mean is 0 but staged mean is {staged_mean:.6f}")
         elif mean_drift > self._max_mean_drift:
             failures.append(
                 f"mean drift {mean_drift:.4%} exceeds threshold {self._max_mean_drift:.4%} "
@@ -207,15 +203,11 @@ class NumericDistributionCheck(Assertion):
 
         # Std-dev drift check
         stddev_drift = self._relative_drift(staged_stddev, reference_stddev)
-        evidence["stddev_drift"] = (
-            round(stddev_drift, 6) if stddev_drift is not None else None
-        )
+        evidence["stddev_drift"] = round(stddev_drift, 6) if stddev_drift is not None else None
 
         if stddev_drift is None:
             if staged_stddev > 1e-10:
-                failures.append(
-                    f"reference std-dev is 0 but staged std-dev is {staged_stddev:.6f}"
-                )
+                failures.append(f"reference std-dev is 0 but staged std-dev is {staged_stddev:.6f}")
         elif stddev_drift > self._max_stddev_drift:
             failures.append(
                 f"std-dev drift {stddev_drift:.4%} exceeds threshold {self._max_stddev_drift:.4%} "
@@ -289,8 +281,7 @@ class NumericDistributionCheck(Assertion):
                     status=AssertionStatus.FAILED,
                     severity=self.severity,
                     message=(
-                        f"{label}['{field}'] must be a non-empty list, "
-                        f"got {type(values).__name__}."
+                        f"{label}['{field}'] must be a non-empty list, got {type(values).__name__}."
                     ),
                     evidence={"source": label, "field": field},
                 )

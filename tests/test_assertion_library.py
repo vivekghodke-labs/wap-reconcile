@@ -108,9 +108,7 @@ class TestFxRateReconciliationFailPath:
         assert "USD_GBP" in result.evidence["mismatches"]
         assert "USD_EUR" in result.evidence["mismatches"]
         # Reviewer can see exact delta without re-running
-        assert result.evidence["mismatches"]["USD_GBP"]["delta"] == pytest.approx(
-            0.04, abs=1e-9
-        )
+        assert result.evidence["mismatches"]["USD_GBP"]["delta"] == pytest.approx(0.04, abs=1e-9)
 
     def test_missing_currency_pair_is_caught(self):
         """Partial load: staged is missing USD_EUR entirely."""
@@ -346,9 +344,7 @@ _STABLE_REFERENCE = [100.0 + i * 0.5 for i in range(20)]  # mean≈104.75, stabl
 
 _WITHIN_TOLERANCE_STAGED = [v + 0.1 for v in _STABLE_REFERENCE]  # tiny upward shift
 
-_MEAN_DRIFTED_STAGED = [
-    v * 2.0 for v in _STABLE_REFERENCE
-]  # 100% mean drift (scale error)
+_MEAN_DRIFTED_STAGED = [v * 2.0 for v in _STABLE_REFERENCE]  # 100% mean drift (scale error)
 
 _UNIT_SWAP_STAGED = [v * 1000.0 for v in _STABLE_REFERENCE]  # bbl→MCF unit swap
 
@@ -490,9 +486,7 @@ class TestNumericDistributionCheckFailPath:
         )
         assert not result.passed
         # The article's caveat must appear in the message
-        assert (
-            "limitation" in result.message.lower() or "shape" in result.message.lower()
-        )
+        assert "limitation" in result.message.lower() or "shape" in result.message.lower()
 
 
 class TestNumericDistributionCheckConstruction:

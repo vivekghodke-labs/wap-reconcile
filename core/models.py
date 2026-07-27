@@ -122,9 +122,7 @@ class RunResult:
                 "A publish claim requires a pointer to what was published."
             )
         if self.status is RunStatus.ERRORED and not self.error:
-            raise ValueError(
-                "RunResult status is ERRORED but no error message was captured."
-            )
+            raise ValueError("RunResult status is ERRORED but no error message was captured.")
 
 
 def new_run_id() -> str:

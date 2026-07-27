@@ -126,6 +126,7 @@ from core.assertions import Assertion
 from core.enums import AssertionStatus, Severity
 from core.models import AssertionResult
 
+
 class MyAssertion(Assertion):
     name = "my_assertion"
     severity = Severity.CRITICAL
@@ -133,8 +134,12 @@ class MyAssertion(Assertion):
     def check(self, staged, reference) -> AssertionResult:
         # compare staged against reference; never mutate either
         ...
-        return AssertionResult(assertion_name=self.name, status=AssertionStatus.PASSED,
-                                severity=self.severity, message="ok")
+        return AssertionResult(
+            assertion_name=self.name,
+            status=AssertionStatus.PASSED,
+            severity=self.severity,
+            message="ok",
+        )
 ```
 
 Known limitation, by design: distribution/statistical checks

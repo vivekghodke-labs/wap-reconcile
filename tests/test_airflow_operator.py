@@ -41,6 +41,7 @@ Coverage matrix:
     version's dag.test() API is unavailable.
 """
 
+# ruff: noqa: E402
 from __future__ import annotations
 
 import pytest

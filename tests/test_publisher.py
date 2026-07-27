@@ -233,9 +233,7 @@ class TestPublishPassPath:
         audit = _fetch_audit_row(run_id)
         assert audit["published_ref"] == published_ref
 
-    def test_promote_published_payload_matches_staged_payload(
-        self, clean_db, publisher
-    ):
+    def test_promote_published_payload_matches_staged_payload(self, clean_db, publisher):
         run_id = new_run_id()
         payload = {"USD_GBP": 0.79, "USD_EUR": 0.92, "source": "reuters"}
         writer = PostgresStagingWriter(run_id=run_id)
@@ -310,9 +308,7 @@ class TestPublishPassPath:
 
         audit = _fetch_audit_row(run_id)
         # DB returns timezone-aware datetime; compare stripped to seconds
-        assert audit["started_at"].replace(microsecond=0) == started_at.replace(
-            microsecond=0
-        )
+        assert audit["started_at"].replace(microsecond=0) == started_at.replace(microsecond=0)
 
     def test_promote_audit_log_completed_at_is_set(self, clean_db, publisher):
         run_id = new_run_id()
@@ -351,9 +347,7 @@ class TestPublishGate:
                 report=report,
             )
 
-    def test_promote_error_message_includes_failed_assertion_names(
-        self, clean_db, publisher
-    ):
+    def test_promote_error_message_includes_failed_assertion_names(self, clean_db, publisher):
         run_id = new_run_id()
         writer = PostgresStagingWriter(run_id=run_id)
         staging_ref = writer.write("fx_rates", {"rate": 0.75})
@@ -423,9 +417,7 @@ class TestPublishGate:
 
 
 class TestPublishAtomicity:
-    def test_failed_report_writes_nothing_to_published_or_audit(
-        self, clean_db, publisher
-    ):
+    def test_failed_report_writes_nothing_to_published_or_audit(self, clean_db, publisher):
         """
         When PublishGateError is raised due to failed assertions, the gate
         fires BEFORE any DB write. Both published.records and wap_audit_log
@@ -450,9 +442,7 @@ class TestPublishAtomicity:
         assert _count_rows("published.records", run_id) == 0
         assert _count_rows("wap_audit_log", run_id) == 0
 
-    def test_successful_promote_writes_both_tables_atomically(
-        self, clean_db, publisher
-    ):
+    def test_successful_promote_writes_both_tables_atomically(self, clean_db, publisher):
         """
         Pass path: both published.records and wap_audit_log must be written.
         Either one missing means the evidence trail is broken.

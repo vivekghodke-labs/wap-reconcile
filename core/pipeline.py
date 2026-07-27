@@ -306,8 +306,7 @@ class ReconciliationPipeline:
             )
 
         logger.warning(
-            "ReconciliationPipeline.run() ROUTED_TO_REVIEW — run_id=%s "
-            "failed_assertions=%d",
+            "ReconciliationPipeline.run() ROUTED_TO_REVIEW — run_id=%s failed_assertions=%d",
             run_id,
             len(report.failed_results),
         )

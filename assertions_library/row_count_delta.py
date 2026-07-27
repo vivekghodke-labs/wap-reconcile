@@ -84,9 +84,7 @@ class RowCountDelta(Assertion):
         row_count_key: str = _ROW_COUNT_KEY,
     ) -> None:
         if (max_absolute_delta is None) == (max_pct_delta is None):
-            raise ValueError(
-                "Exactly one of max_absolute_delta or max_pct_delta must be provided."
-            )
+            raise ValueError("Exactly one of max_absolute_delta or max_pct_delta must be provided.")
         if max_absolute_delta is not None and max_absolute_delta < 0:
             raise ValueError("max_absolute_delta must be >= 0")
         if max_pct_delta is not None and not (0.0 <= max_pct_delta <= 100.0):
@@ -147,9 +145,7 @@ class RowCountDelta(Assertion):
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _extract_counts(
-        self, staged: Any, reference: Any
-    ) -> tuple[int, int] | AssertionResult:
+    def _extract_counts(self, staged: Any, reference: Any) -> tuple[int, int] | AssertionResult:
         """
         Extract integer row counts from both payloads.
         Returns (staged_count, reference_count) or a FAILED AssertionResult.
@@ -210,8 +206,7 @@ class RowCountDelta(Assertion):
                 status=AssertionStatus.PASSED,
                 severity=self.severity,
                 message=(
-                    f"Row count delta {absolute_delta} is within "
-                    f"absolute threshold {threshold}."
+                    f"Row count delta {absolute_delta} is within absolute threshold {threshold}."
                 ),
                 evidence={
                     "staged_count": staged_count,

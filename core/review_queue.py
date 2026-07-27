@@ -184,8 +184,7 @@ class ReviewQueueRouter:
         severity = _severity_value(report.highest_failed_severity)
 
         logger.warning(
-            "ReviewQueueRouter.route() — run_id=%s dataset_key=%s "
-            "severity=%s failed_assertions=%d",
+            "ReviewQueueRouter.route() — run_id=%s dataset_key=%s severity=%s failed_assertions=%d",
             run_id,
             dataset_key,
             severity,
@@ -284,6 +283,8 @@ class ReviewQueueRouter:
             },
         )
         row = cur.fetchone()
+        if row is None:
+            raise RuntimeError("INSERT RETURNING id yielded no rows")
         return row[0]  # RETURNING id
 
     @staticmethod

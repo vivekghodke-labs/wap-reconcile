@@ -43,7 +43,10 @@ Design:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from airflow.utils.context import Context
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -82,7 +85,7 @@ class WAPReviewRequiredException(AirflowException):
     """
 
 
-def _resolve(value: Resolvable, context: dict) -> Any:
+def _resolve(value: Resolvable, context: Any) -> Any:
     """
     Resolve an operator argument that may be a literal or a callable.
 
@@ -182,7 +185,7 @@ class WAPReconciliationOperator(BaseOperator):
     # Airflow interface
     # ------------------------------------------------------------------
 
-    def execute(self, context: dict) -> dict:
+    def execute(self, context: "Context") -> dict:
         """
         Resolve arguments, run the pipeline once, push evidence to XCom,
         and translate the terminal RunStatus into Airflow task
@@ -248,7 +251,7 @@ class WAPReconciliationOperator(BaseOperator):
             "error": result.error,
         }
 
-    def _push_evidence(self, context: dict, result: RunResult) -> None:
+    def _push_evidence(self, context: Any, result: RunResult) -> None:
         """
         Push run evidence to XCom regardless of outcome, BEFORE any
         exception is raised. A task that fails must still leave a

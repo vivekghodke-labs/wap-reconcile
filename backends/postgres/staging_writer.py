@@ -37,9 +37,7 @@ from backends.postgres.connection import get_connection
 from core.staging import StagingWriteError, StagingWriter
 
 # Matches staging://{dataset_key}/{run_id}
-_STAGING_REF_PATTERN = re.compile(
-    r"^staging://(?P<dataset_key>[^/]+)/(?P<run_id>[0-9a-f-]{36})$"
-)
+_STAGING_REF_PATTERN = re.compile(r"^staging://(?P<dataset_key>[^/]+)/(?P<run_id>[0-9a-f-]{36})$")
 
 
 def _parse_staging_ref(staging_ref: str) -> tuple[str, str]:
@@ -80,9 +78,7 @@ def _validate_dataset_key(key: str) -> None:
     if not key or not isinstance(key, str):
         raise StagingWriteError("dataset_key must be a non-empty string.")
     if "/" in key or "\\" in key:
-        raise StagingWriteError(
-            f"dataset_key must not contain '/' or '\\'. Got: '{key}'."
-        )
+        raise StagingWriteError(f"dataset_key must not contain '/' or '\\'. Got: '{key}'.")
 
 
 def _validate_run_id(run_id: str) -> None:
@@ -90,9 +86,7 @@ def _validate_run_id(run_id: str) -> None:
     try:
         UUID(run_id, version=4)
     except (ValueError, AttributeError) as exc:
-        raise StagingWriteError(
-            f"run_id must be a valid UUID4 string. Got: '{run_id}'."
-        ) from exc
+        raise StagingWriteError(f"run_id must be a valid UUID4 string. Got: '{run_id}'.") from exc
 
 
 class PostgresStagingWriter(StagingWriter):
@@ -195,9 +189,7 @@ class PostgresStagingWriter(StagingWriter):
                 cur.execute(sql, {"staging_ref": staging_ref})
                 row = cur.fetchone()
         except psycopg2.Error as exc:
-            raise StagingWriteError(
-                f"Failed to read staged record '{staging_ref}': {exc}"
-            ) from exc
+            raise StagingWriteError(f"Failed to read staged record '{staging_ref}': {exc}") from exc
 
         if row is None:
             raise StagingWriteError(

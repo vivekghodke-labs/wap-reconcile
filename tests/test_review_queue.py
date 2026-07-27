@@ -229,9 +229,7 @@ class TestRouteHappyPath:
         assert row is not None
         assert row[0] == payload
 
-    def test_route_queue_severity_is_critical_when_critical_assertion_fails(
-        self, clean_db, router
-    ):
+    def test_route_queue_severity_is_critical_when_critical_assertion_fails(self, clean_db, router):
         run_id = new_run_id()
         writer = PostgresStagingWriter(run_id=run_id)
         staging_ref = writer.write("fx_rates", {"rate": 0.75})
@@ -253,9 +251,7 @@ class TestRouteHappyPath:
         queue_row = _fetch_queue_row(run_id)
         assert queue_row["severity"] == Severity.CRITICAL.value
 
-    def test_route_queue_severity_is_warn_for_single_warn_failure(
-        self, clean_db, router
-    ):
+    def test_route_queue_severity_is_warn_for_single_warn_failure(self, clean_db, router):
         run_id = new_run_id()
         writer = PostgresStagingWriter(run_id=run_id)
         staging_ref = writer.write("fx_rates", {"rate": 0.75})
@@ -350,9 +346,7 @@ class TestRouteHappyPath:
         )
 
         audit = _fetch_audit_row(run_id)
-        assert audit["started_at"].replace(microsecond=0) == started_at.replace(
-            microsecond=0
-        )
+        assert audit["started_at"].replace(microsecond=0) == started_at.replace(microsecond=0)
 
     def test_route_audit_log_completed_at_is_set(self, clean_db, router):
         run_id = new_run_id()
@@ -377,9 +371,7 @@ class TestRouteHappyPath:
 
 
 class TestReportContent:
-    def test_queue_entry_report_contains_failed_assertion_details(
-        self, clean_db, router
-    ):
+    def test_queue_entry_report_contains_failed_assertion_details(self, clean_db, router):
         run_id = new_run_id()
         writer = PostgresStagingWriter(run_id=run_id)
         staging_ref = writer.write("fx_rates", {"rate": 0.75})

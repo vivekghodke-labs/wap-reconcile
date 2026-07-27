@@ -88,9 +88,7 @@ class TestNoSnapshotExists:
         """
         source = SnapshotReferenceSource()
 
-        with pytest.raises(
-            ReferenceResolutionError, match="No prior published snapshot"
-        ):
+        with pytest.raises(ReferenceResolutionError, match="No prior published snapshot"):
             source.resolve("fx_rates")
 
     def test_resolve_raises_for_unknown_key_even_if_others_exist(self, clean_db):
@@ -99,9 +97,7 @@ class TestNoSnapshotExists:
 
         source = SnapshotReferenceSource()
 
-        with pytest.raises(
-            ReferenceResolutionError, match="No prior published snapshot"
-        ):
+        with pytest.raises(ReferenceResolutionError, match="No prior published snapshot"):
             source.resolve("fx_rates")
 
 
@@ -139,9 +135,7 @@ class TestSnapshotExists:
         old_payload = {"USD_GBP": 0.75, "note": "old"}
         new_payload = {"USD_GBP": 0.79, "note": "new"}
 
-        _insert_published_record(
-            "fx_rates", old_payload, published_at=now - timedelta(days=1)
-        )
+        _insert_published_record("fx_rates", old_payload, published_at=now - timedelta(days=1))
         _insert_published_record("fx_rates", new_payload, published_at=now)
 
         source = SnapshotReferenceSource()

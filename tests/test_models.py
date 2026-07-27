@@ -108,12 +108,8 @@ class TestReconciliationReport:
         report = ReconciliationReport(
             run_id=new_run_id(),
             results=[
-                make_result(
-                    AssertionStatus.FAILED, severity=Severity.WARN, message="a"
-                ),
-                make_result(
-                    AssertionStatus.FAILED, severity=Severity.CRITICAL, message="b"
-                ),
+                make_result(AssertionStatus.FAILED, severity=Severity.WARN, message="a"),
+                make_result(AssertionStatus.FAILED, severity=Severity.CRITICAL, message="b"),
                 make_result(AssertionStatus.PASSED, severity=Severity.INFO),
             ],
         )

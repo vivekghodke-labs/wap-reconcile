@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import pytest
 
+from backends.postgres.connection import get_connection
 from backends.postgres.staging_writer import PostgresStagingWriter
 from core.models import new_run_id
 from core.staging import StagingWriteError
@@ -241,9 +242,7 @@ class TestStagingRefFor:
         staging_writer.staging_ref_for("fx_rates")
 
         with get_connection() as conn, conn.cursor() as cur:
-            cur.execute(
-                "SELECT COUNT(*) FROM staging.records WHERE dataset_key = 'fx_rates'"
-            )
+            cur.execute("SELECT COUNT(*) FROM staging.records WHERE dataset_key = 'fx_rates'")
             count = cur.fetchone()[0]
 
         assert count == 0
@@ -266,10 +265,3 @@ class TestRunIdAccessor:
     def test_invalid_run_id_raises_at_construction(self):
         with pytest.raises(StagingWriteError, match="UUID4"):
             PostgresStagingWriter(run_id="not-a-uuid")
-
-
-# ---------------------------------------------------------------------------
-# Import fix for staging_ref_for test that uses get_connection directly
-# ---------------------------------------------------------------------------
-
-from backends.postgres.connection import get_connection
