@@ -46,12 +46,12 @@ published_ref format: published://{dataset_key}/{run_id}
 """
 
 from __future__ import annotations
-from typing import Any, cast
 
 import dataclasses
 import json
 import logging
 from datetime import datetime, timezone
+from typing import Any, cast
 
 import psycopg2
 from psycopg2.extras import Json, RealDictCursor
