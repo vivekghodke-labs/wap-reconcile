@@ -1,0 +1,1 @@
+apache-airflow>=2.9,<3.0   # optional adapter extra — install only if using adapters/airflow_operator.py

@@ -1,0 +1,15 @@
+# WAP Reconciliation Framework — Runtime Dependencies
+#
+# Deliberately minimal. core/ has ZERO orchestrator dependency by design
+# (see adapters/airflow_operator.py docstring) — apache-airflow is NOT
+# listed here. It lives in requirements-airflow.txt / the pyproject.toml
+# [airflow] extra, installed only by consumers who use the adapter.
+#
+# Pin to minor versions (X.Y.*) for reproducibility without blocking
+# patch-level security fixes. Exact pins (==) belong in a lock file,
+# not here — this is a framework, not a deployed application.
+
+# Postgres driver — binary wheel avoids C compilation in most environments.
+# On platforms without a pre-built wheel, the Dockerfile installs
+# libpq-dev + gcc as a fallback.
+psycopg2-binary>=2.9,<3.0
